@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -32,33 +33,30 @@ public class Main extends Application {
 	Connection conn;
 	PreparedStatement pst = null;
 	ResultSet rs = null;
+	Stage thestage;
+	Button viewCoaches;
+	Scene scene, viewSwimmerScene;
+	BorderPane first, second;
 	// Button newCoach, newSwimmer, viewCoaches, viewSwimmers;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			
+			thestage = primaryStage;
+			
 			// Check the connection with the database
 			CheckConnection();
 
 			primaryStage.setTitle("Swimming");
-			BorderPane layout = new BorderPane();
-
-			Scene scene = new Scene(layout, 300, 400, Color.rgb(0, 0, 0, 0));
-
+			first = new BorderPane();
+			second = new BorderPane();
+			
 			Group root = new Group();
-			Scene newSwimmerScene = new Scene(root, 1200, 600, Color.rgb(0, 0, 0, 0));
+			scene = new Scene(first, 220, 220, Color.rgb(0, 0, 0, 0));
+			
 			// Scene scene = new Scene(root, 320, 250, Color.rgb(0, 0, 0, 0));
-
-			Color foreground = Color.rgb(255, 255, 255, 0.9);
-			Rectangle background = new Rectangle(320, 250);
-			background.setX(0);
-			background.setY(0);
-			background.setArcHeight(15);
-			background.setArcWidth(15);
-			background.setFill(Color.rgb(0, 0, 0, 0.55));
-			background.setStroke(foreground);
-			background.setStrokeWidth(1.5);
 
 			VBox vbox = new VBox(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
@@ -72,7 +70,7 @@ public class Main extends Application {
 			}
 			label.setFont(new Font("SanSerif", 20));
 
-			VBox buttons = new VBox(5);
+			//VBox buttons = new VBox(5);
 
 			Button newCoach = new Button("Add new coach");
 			newCoach.setPrefSize(200, 20);
@@ -90,26 +88,27 @@ public class Main extends Application {
 				primaryStage.show();
 			});
 
-			Button viewCoaches = new Button("View All Coaches");
+			viewCoaches = new Button("View All Coaches");
 			viewCoaches.setPrefSize(200, 20);
 			viewCoaches.setFont(Font.font("SanSerif", 15));
-			viewCoaches.setOnAction(e -> {
-				primaryStage.setScene(scene);
-				primaryStage.show();
-			});
+			viewCoaches.setOnAction(e-> ButtonClicked(e));
+			
 
 			Button viewSwimmer = new Button("View All Swimmers");
 			viewSwimmer.setPrefSize(200, 20);
 			viewSwimmer.setFont(Font.font("SanSerif", 15));
 			viewSwimmer.setOnAction(e -> {
-				primaryStage.setScene(newSwimmerScene);
-				primaryStage.show();
+//				primaryStage.setScene(viewSwimmerScene);
+//				primaryStage.show();
+//				thestage.setScene(viewSwimmerScene);
 			});
 
-			buttons.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer);
-
-			layout.setCenter(buttons);
+			vbox.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer);
+			root.getChildren().addAll(vbox);
+			
+			first.setCenter(vbox);
 			BorderPane.setMargin(root, new Insets(20, 20, 20, 20));
+			
 
 			// Table for viewing data inside database
 			TableView<Swimmer> table = new TableView<>();
@@ -239,6 +238,8 @@ public class Main extends Application {
 				}
 			});
 			
+		
+			
 			try {
 				data.clear();
 				String query = "select * from swimmers";
@@ -264,9 +265,14 @@ public class Main extends Application {
 			table.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8, column9);
 			table.setTableMenuButtonVisible(true);
 
-			VBox rightSide = new VBox(5);
-			rightSide.getChildren().addAll(table);
-			layout.setRight(rightSide);
+//			VBox rightSide = new VBox(5);
+//			rightSide.getChildren().addAll(table);
+			second.getChildren().addAll(table);
+			viewSwimmerScene = new Scene(second, 1200, 600);
+			
+			
+//			second.setCenter(rightSide);
+		
 			BorderPane.setMargin(table, new Insets(0, 20, 10, 0));
 
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -289,6 +295,14 @@ public class Main extends Application {
 			System.out.println("Connection Successful");
 		}
 	}
+	
+	 public void ButtonClicked(ActionEvent e)
+	    {
+	        if (e.getSource()== viewCoaches )
+	            thestage.setScene(viewSwimmerScene);
+	        else
+	            thestage.setScene(scene);
+	    }
 
 	public static void main(String[] args) {
 		launch(args);
