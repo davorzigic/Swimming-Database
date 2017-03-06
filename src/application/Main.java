@@ -22,6 +22,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -34,7 +35,7 @@ public class Main extends Application {
 	PreparedStatement pst = null;
 	ResultSet rs = null;
 	Stage thestage;
-	Button viewCoaches;
+	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back;
 	BorderPane first, second;
 	Scene mainScene, viewSwimmerScene;
 
@@ -52,13 +53,14 @@ public class Main extends Application {
 			CheckConnection();
 
 			primaryStage.setTitle("Swimming");
+			primaryStage.getIcons().add(new Image("file:Shark.jpg"));
 			first = new BorderPane();
 			second = new BorderPane();
 
 			Group root = new Group();
 			Group viewSwimmers = new Group();
 
-			mainScene = new Scene(first, 220, 220, Color.rgb(0, 0, 0, 0));
+			mainScene = new Scene(first, 225, 220, Color.rgb(0, 0, 0, 0));
 			viewSwimmerScene = new Scene(second, 1200, 600);
 
 			VBox vbox = new VBox(5);
@@ -78,7 +80,7 @@ public class Main extends Application {
 
 			// VBox buttons = new VBox(5);
 
-			Button newCoach = new Button("Add new coach");
+			newCoach = new Button("Add new coach");
 			newCoach.setPrefSize(200, 20);
 			newCoach.setFont(Font.font("SanSerif", 15));
 			newCoach.setOnAction(e -> {
@@ -86,7 +88,7 @@ public class Main extends Application {
 				primaryStage.show();
 			});
 
-			Button newSwimmer = new Button("Add new swimmer");
+			newSwimmer = new Button("Add new swimmer");
 			newSwimmer.setPrefSize(200, 20);
 			newSwimmer.setFont(Font.font("SanSerif", 15));
 			newSwimmer.setOnAction(e -> {
@@ -99,7 +101,7 @@ public class Main extends Application {
 			viewCoaches.setFont(Font.font("SanSerif", 15));
 			viewCoaches.setOnAction(e -> ButtonClicked(e));
 
-			Button viewSwimmer = new Button("View All Swimmers");
+			viewSwimmer = new Button("View All Swimmers");
 			viewSwimmer.setPrefSize(200, 20);
 			viewSwimmer.setFont(Font.font("SanSerif", 15));
 			viewSwimmer.setOnAction(e -> {
@@ -240,9 +242,11 @@ public class Main extends Application {
 					return u.getValue().getCoach();
 				}
 			});
-
+			
+			
+			// Filling the table with the data from the database
 			try {
-				data.clear();
+				data.clear();		// clears the table
 				String query = "select * from swimmers";
 
 				pst = conn.prepareStatement(query);
@@ -265,17 +269,25 @@ public class Main extends Application {
 			table.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8, column9);
 			// Sorting button
 			table.setTableMenuButtonVisible(true);
-
+			
+			
+			// BACK BUTTON
+			back = new Button("Back");
+			back.setOnAction(e -> {
+				thestage.setScene(mainScene);
+				thestage.show();
+			});
+			back.setPadding(new Insets(5,10,5,5));
+			second.setTop(back);
+			BorderPane.setMargin(back, new Insets(5,0,5,5));
+			
 			vbox2.getChildren().add(table);
 			viewSwimmers.getChildren().addAll(vbox2);
 
 			second.setCenter(vbox2);
 			BorderPane.setMargin(viewSwimmers, new Insets(20, 20, 20, 20));
-
-
-			// BorderPane.setMargin(table, new Insets(0, 20, 10, 0));
-
-			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			
+			mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(mainScene);
 			primaryStage.show();
 		} catch (Exception e) {
