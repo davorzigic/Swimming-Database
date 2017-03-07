@@ -1,5 +1,6 @@
 package application;
 
+import java.awt.Checkbox;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,13 +15,16 @@ import javafx.geometry.Insets;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -37,8 +41,11 @@ public class Main extends Application {
 	ResultSet rs = null;
 	Stage thestage;
 	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back;
-	BorderPane first, second, third;
+	BorderPane firstBorderPane, secondBorderPane, thirdBorderPane;
 	Scene mainScene, viewSwimmerScene, addSwimmerScene;
+	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber; 
+	ComboBox coach;
+	
 
 	TableView<Swimmer> swimmersTable;
 
@@ -54,32 +61,77 @@ public class Main extends Application {
 
 			primaryStage.setTitle("Swimming");
 			primaryStage.getIcons().add(new Image("file:Shark.jpg"));
-			first = new BorderPane();
-			second = new BorderPane();
-			third = new BorderPane();
+			
+			firstBorderPane = new BorderPane();
+			secondBorderPane = new BorderPane();
+			thirdBorderPane = new BorderPane();
 			
 			Group root = new Group();
-			Group viewSwimmers = new Group();
-			Group addSwimmer = new Group();
+			Group viewSwimmersGroup = new Group();
+			Group addSwimmerGroup = new Group();
 
-			mainScene = new Scene(first, 225, 220, Color.rgb(0, 0, 0, 0));
-			viewSwimmerScene = new Scene(second, 1200, 600);
-			addSwimmerScene = new Scene(third, 500, 500);
+			mainScene = new Scene(firstBorderPane, 225, 220, Color.rgb(0, 0, 0, 0));
+			viewSwimmerScene = new Scene(secondBorderPane, 1200, 600);
+			addSwimmerScene = new Scene(thirdBorderPane, 500, 500);
 
-			VBox vbox = new VBox(5);
-			vbox.setPadding(new Insets(10, 0, 0, 10));
+			VBox vBoxForButtons = new VBox(5);
+			vBoxForButtons.setPadding(new Insets(10, 0, 0, 10));
 
 			VBox vBoxForTable = new VBox(5);
-			vBoxForTable.setPadding(new Insets(10, 0, 0, 10));
+			vBoxForTable.setPadding(new Insets(10, 10, 10, 10));
 
-			VBox vbox3 = new VBox(5);
-			vbox3.setPadding(new Insets(10, 0, 0, 10));
-
+			VBox vBoxTextFields = new VBox(5);
+			vBoxTextFields.setPadding(new Insets(10, 10, 10, 10));
 			
-			addSwimmer.getChildren().addAll(vbox3);
-
-			third.setTop(vbox3);
-			BorderPane.setMargin(addSwimmer, new Insets(20, 20, 20, 20));
+			idSwimmer = new TextField();
+			idSwimmer.setPrefSize(200, 20);
+			idSwimmer.setFont(Font.font("SanSerif",15));
+			idSwimmer.setPromptText("ID");
+			
+			firstName = new TextField();
+			firstName.setPrefSize(200, 20);
+			firstName.setFont(Font.font("SanSerif",15));
+			firstName.setPromptText("First Name");
+			
+			lastName = new TextField();
+			lastName.setPrefSize(200, 20);
+			lastName.setFont(Font.font("SanSerif",15));
+			lastName.setPromptText("Last Name");
+			
+			registrationId = new TextField();
+			registrationId.setPrefSize(200, 20);
+			registrationId.setFont(Font.font("SanSerif",15));
+			registrationId.setPromptText("Registration ID");
+			
+			parentName = new TextField();
+			parentName.setPrefSize(200, 20);
+			parentName.setFont(Font.font("SanSerif",15));
+			parentName.setPromptText("Parent Name");
+			
+			contactNumber = new TextField();
+			contactNumber.setPrefSize(200, 20);
+			contactNumber.setFont(Font.font("SanSerif",15));
+			contactNumber.setPromptText("Contact Number");
+			
+			coach = new ComboBox<>();
+			
+			
+			vBoxTextFields.getChildren().addAll(idSwimmer, firstName, lastName, registrationId, parentName, contactNumber, coach);
+			
+			
+			
+			addSwimmerGroup.getChildren().addAll(vBoxTextFields);
+			
+			Button backFromNewSwimmer = new Button("Back");
+			backFromNewSwimmer.setOnAction(e -> {
+				thestage.setScene(mainScene);
+				thestage.show();
+			});
+			thirdBorderPane.setTop(backFromNewSwimmer);
+			BorderPane.setMargin(backFromNewSwimmer, new Insets(10,0,0,10));
+			
+			thirdBorderPane.setCenter(vBoxTextFields);
+			BorderPane.setMargin(addSwimmerGroup, new Insets(20, 20, 20, 20));
 			
 			
 			Label label = new Label();
@@ -123,10 +175,10 @@ public class Main extends Application {
 				thestage.show();
 			});
 
-			vbox.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer);
-			root.getChildren().addAll(vbox);
+			vBoxForButtons.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer);
+			root.getChildren().addAll(vBoxForButtons);
 
-			first.setCenter(vbox);
+			firstBorderPane.setCenter(vBoxForButtons);
 			BorderPane.setMargin(root, new Insets(20, 20, 20, 20));
 
 			// Table for viewing data inside database
@@ -205,9 +257,9 @@ public class Main extends Application {
 
 			// Getting the DOB from the database and inserting it into the
 
-			TableColumn<Swimmer, String> column6 = new TableColumn<Swimmer, String>("DOB");
+			TableColumn<Swimmer, String> column6 = new TableColumn<Swimmer, String>("DOJ");
 			column6.setMinWidth(100);
-			column6.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("DOB"));
+			column6.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("DOJ"));
 			column6.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
 				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
 					// u.getValue() returns the User instance for a particular
@@ -278,12 +330,15 @@ public class Main extends Application {
 				System.err.println(e2);
 
 			}
+			
+			coach.setItems(data);
 
 			// Here was unchecked warning
 			swimmersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8, column9);
+			swimmersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 			
 			
-			// Sorting button
+			// Sorting button in the table
 			swimmersTable.setTableMenuButtonVisible(true);
 			
 			
@@ -294,14 +349,15 @@ public class Main extends Application {
 				thestage.show();
 			});
 			back.setPadding(new Insets(5,5,5,5));
-			second.setTop(back);
+			secondBorderPane.setTop(back);
 			BorderPane.setMargin(back, new Insets(10,0,0,10));
 			
+			
 			vBoxForTable.getChildren().add(swimmersTable);
-			viewSwimmers.getChildren().addAll(vBoxForTable);
+			viewSwimmersGroup.getChildren().addAll(vBoxForTable);
 
-			second.setCenter(vBoxForTable);
-			BorderPane.setMargin(viewSwimmers, new Insets(20, 20, 20, 20));
+			secondBorderPane.setCenter(vBoxForTable);
+			BorderPane.setMargin(viewSwimmersGroup, new Insets(20, 20, 20, 20));
 			
 			mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(mainScene);
