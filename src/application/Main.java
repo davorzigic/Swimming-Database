@@ -45,6 +45,7 @@ public class Main extends Application {
 	Scene mainScene, viewSwimmerScene, addSwimmerScene;
 	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber; 
 	ComboBox coach;
+	DatePicker DOB, DOJ;
 	
 
 	TableView<Swimmer> swimmersTable;
@@ -114,9 +115,22 @@ public class Main extends Application {
 			contactNumber.setPromptText("Contact Number");
 			
 			coach = new ComboBox<>();
+			coach.setPrefSize(490, 20);
+			coach.setPromptText("Coach");
+			
+			DOB = new DatePicker();
+			DOB.setPromptText("Date of birth");
+			DOB.setPrefSize(490, 20);
+			DOB.setStyle("-fx-font-size:15");
+
+			
+			DOJ = new DatePicker();
+			DOJ.setPromptText("Date of joining");
+			DOJ.setPrefSize(490, 20);
+			DOJ.setStyle("-fx-font-size:15");
 			
 			
-			vBoxTextFields.getChildren().addAll(idSwimmer, firstName, lastName, registrationId, parentName, contactNumber, coach);
+			vBoxTextFields.getChildren().addAll(idSwimmer, firstName, lastName, DOB, registrationId, DOJ, parentName, contactNumber, coach);
 			
 			
 			
@@ -331,7 +345,7 @@ public class Main extends Application {
 
 			}
 			
-			coach.setItems(data);
+			
 
 			// Here was unchecked warning
 			swimmersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8, column9);
