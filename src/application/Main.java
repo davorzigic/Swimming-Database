@@ -18,6 +18,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -25,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -43,10 +45,9 @@ public class Main extends Application {
 	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back;
 	BorderPane firstBorderPane, secondBorderPane, thirdBorderPane;
 	Scene mainScene, viewSwimmerScene, addSwimmerScene;
-	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber; 
-	ComboBox coach;
+	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber;
+	ComboBox<String> coach;
 	DatePicker DOB, DOJ;
-	
 
 	TableView<Swimmer> swimmersTable;
 
@@ -62,11 +63,11 @@ public class Main extends Application {
 
 			primaryStage.setTitle("Swimming");
 			primaryStage.getIcons().add(new Image("file:Shark.jpg"));
-			
+
 			firstBorderPane = new BorderPane();
 			secondBorderPane = new BorderPane();
 			thirdBorderPane = new BorderPane();
-			
+
 			Group root = new Group();
 			Group viewSwimmersGroup = new Group();
 			Group addSwimmerGroup = new Group();
@@ -83,71 +84,110 @@ public class Main extends Application {
 
 			VBox vBoxTextFields = new VBox(5);
 			vBoxTextFields.setPadding(new Insets(10, 10, 10, 10));
-			
+
 			idSwimmer = new TextField();
 			idSwimmer.setPrefSize(200, 20);
-			idSwimmer.setFont(Font.font("SanSerif",15));
+			idSwimmer.setFont(Font.font("SanSerif", 15));
 			idSwimmer.setPromptText("ID");
-			
+
 			firstName = new TextField();
 			firstName.setPrefSize(200, 20);
-			firstName.setFont(Font.font("SanSerif",15));
+			firstName.setFont(Font.font("SanSerif", 15));
 			firstName.setPromptText("First Name");
-			
+
 			lastName = new TextField();
 			lastName.setPrefSize(200, 20);
-			lastName.setFont(Font.font("SanSerif",15));
+			lastName.setFont(Font.font("SanSerif", 15));
 			lastName.setPromptText("Last Name");
-			
+
 			registrationId = new TextField();
 			registrationId.setPrefSize(200, 20);
-			registrationId.setFont(Font.font("SanSerif",15));
+			registrationId.setFont(Font.font("SanSerif", 15));
 			registrationId.setPromptText("Registration ID");
-			
+
 			parentName = new TextField();
 			parentName.setPrefSize(200, 20);
-			parentName.setFont(Font.font("SanSerif",15));
+			parentName.setFont(Font.font("SanSerif", 15));
 			parentName.setPromptText("Parent Name");
-			
+
 			contactNumber = new TextField();
 			contactNumber.setPrefSize(200, 20);
-			contactNumber.setFont(Font.font("SanSerif",15));
+			contactNumber.setFont(Font.font("SanSerif", 15));
 			contactNumber.setPromptText("Contact Number");
 			
-			coach = new ComboBox<>();
+			ObservableList<String> coaches = FXCollections.observableArrayList("Davor", "Boba", "Aleksandar");
+			coach = new ComboBox<>(coaches);
 			coach.setPrefSize(490, 20);
 			coach.setPromptText("Coach");
-			
+
 			DOB = new DatePicker();
 			DOB.setPromptText("Date of birth");
 			DOB.setPrefSize(490, 20);
 			DOB.setStyle("-fx-font-size:15");
 
-			
 			DOJ = new DatePicker();
 			DOJ.setPromptText("Date of joining");
 			DOJ.setPrefSize(490, 20);
 			DOJ.setStyle("-fx-font-size:15");
-			
-			
-			vBoxTextFields.getChildren().addAll(idSwimmer, firstName, lastName, DOB, registrationId, DOJ, parentName, contactNumber, coach);
-			
-			
-			
+
+			// Save button
+			Button saveButton = new Button("Save");
+			saveButton.setFont(Font.font("SanSerif", 15));
+			saveButton.setOnAction(e -> {
+				try {
+					if (idSwimmer.getText().isEmpty()) {
+						System.out.println("You dont have ID");
+						Alert alert = new Alert(AlertType.WARNING);
+						alert.setTitle("Information dialog");
+						alert.setHeaderText(null);
+						alert.setContentText("Your ID field is empty.");
+						alert.showAndWait();
+
+					} else {
+						String query = "INSERT INTO swimmers (idSwimmer, firstName, lastName, DOB, registrationId, dateJoined, parentName, contactNumber, coach) VALUES(?,?,?,?,?,?,?,?,?)";
+						pst = conn.prepareStatement(query);
+						pst.setString(1, idSwimmer.getText());
+						pst.setString(2, firstName.getText());
+						pst.setString(3, lastName.getText());
+						pst.setString(4, ((TextField) DOB.getEditor()).getText());
+						pst.setString(5, registrationId.getText());
+						pst.setString(6, ((TextField) DOJ.getEditor()).getText());
+						pst.setString(7, parentName.getText());
+						pst.setString(8, contactNumber.getText());
+						pst.setString(9, "Davor");
+						pst.execute();
+						pst.close();
+
+						clearFields();
+
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Information dialog");
+						alert.setHeaderText(null);
+						alert.setContentText("User has been created!");
+						alert.showAndWait();
+					}
+
+				} catch (Exception e1) {
+					System.err.println(e1);
+				}
+			});
+
+			vBoxTextFields.getChildren().addAll(idSwimmer, firstName, lastName, DOB, registrationId, DOJ, parentName,
+					contactNumber, coach, saveButton);
+
 			addSwimmerGroup.getChildren().addAll(vBoxTextFields);
-			
+
 			Button backFromNewSwimmer = new Button("Back");
 			backFromNewSwimmer.setOnAction(e -> {
 				thestage.setScene(mainScene);
 				thestage.show();
 			});
 			thirdBorderPane.setTop(backFromNewSwimmer);
-			BorderPane.setMargin(backFromNewSwimmer, new Insets(10,0,0,10));
-			
+			BorderPane.setMargin(backFromNewSwimmer, new Insets(10, 0, 0, 10));
+
 			thirdBorderPane.setCenter(vBoxTextFields);
 			BorderPane.setMargin(addSwimmerGroup, new Insets(20, 20, 20, 20));
-			
-			
+
 			Label label = new Label();
 			label.setTextFill(Color.RED);
 			if (conn == null) {
@@ -322,11 +362,10 @@ public class Main extends Application {
 					return u.getValue().getCoach();
 				}
 			});
-			
-			
+
 			// Filling the table with the data from the database
 			try {
-				data.clear();		// clears the table
+				data.clear(); // clears the table
 				String query = "select * from swimmers";
 
 				pst = conn.prepareStatement(query);
@@ -344,35 +383,31 @@ public class Main extends Application {
 				System.err.println(e2);
 
 			}
-			
-			
 
 			// Here was unchecked warning
-			swimmersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8, column9);
+			swimmersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8,
+					column9);
 			swimmersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-			
-			
+
 			// Sorting button in the table
 			swimmersTable.setTableMenuButtonVisible(true);
-			
-			
+
 			// BACK BUTTON
 			back = new Button("Back");
 			back.setOnAction(e -> {
 				thestage.setScene(mainScene);
 				thestage.show();
 			});
-			back.setPadding(new Insets(5,5,5,5));
+			back.setPadding(new Insets(5, 5, 5, 5));
 			secondBorderPane.setTop(back);
-			BorderPane.setMargin(back, new Insets(10,0,0,10));
-			
-			
+			BorderPane.setMargin(back, new Insets(10, 0, 0, 10));
+
 			vBoxForTable.getChildren().add(swimmersTable);
 			viewSwimmersGroup.getChildren().addAll(vBoxForTable);
 
 			secondBorderPane.setCenter(vBoxForTable);
 			BorderPane.setMargin(viewSwimmersGroup, new Insets(20, 20, 20, 20));
-			
+
 			mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(mainScene);
 			primaryStage.show();
@@ -393,7 +428,21 @@ public class Main extends Application {
 			System.out.println("Connection Successful");
 		}
 	}
-
+	
+	/***
+	 * This method clears the fields after pressing the Save button
+	 */
+	public void clearFields() {
+		idSwimmer.clear();
+		firstName.clear();
+		lastName.clear();
+		DOB.setValue(null);
+		registrationId.clear();
+		DOJ.setValue(null);
+		parentName.clear();
+		contactNumber.clear();
+		coach.setValue(null);
+	}
 
 	public static void main(String[] args) {
 		launch(args);
