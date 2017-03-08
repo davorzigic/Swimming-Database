@@ -52,7 +52,7 @@ public class Main extends Application {
 	ResultSet rs = null;
 	Stage thestage;
 	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back, close, delete, refresh;
-	BorderPane firstBorderPane, secondBorderPane, thirdBorderPane;
+	BorderPane firstBorderPane, secondBorderPane, thirdBorderPane, fourthBorderPane;
 	Scene mainScene, viewSwimmerScene, addSwimmerScene;
 	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber;
 	ComboBox<String> coach;
@@ -77,6 +77,7 @@ public class Main extends Application {
 			firstBorderPane = new BorderPane();
 			secondBorderPane = new BorderPane();
 			thirdBorderPane = new BorderPane();
+			fourthBorderPane = new BorderPane();
 
 			Group root = new Group();
 			Group viewSwimmersGroup = new Group();
@@ -265,8 +266,9 @@ public class Main extends Application {
 			viewCoaches.setPrefSize(200, 20);
 			viewCoaches.setFont(Font.font("SanSerif", 15));
 			viewCoaches.setOnAction(EventHandler -> {
-				thestage.setScene(mainScene);
-				thestage.show();
+//				ViewCoach coachScene = new ViewCoach(fourthBorderPane);
+//				thestage.setScene(coachScene);
+//				thestage.show();
 			});
 
 			viewSwimmer = new Button("View All Swimmers");
