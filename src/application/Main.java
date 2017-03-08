@@ -4,6 +4,11 @@ import java.awt.Checkbox;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+
+import javax.swing.GroupLayout.Alignment;
+
+import com.sun.prism.shader.DrawCircle_LinearGradient_REFLECT_AlphaTest_Loader;
 
 import javafx.application.Application;
 import javafx.beans.value.ObservableValue;
@@ -12,8 +17,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -42,7 +49,7 @@ public class Main extends Application {
 	PreparedStatement pst = null;
 	ResultSet rs = null;
 	Stage thestage;
-	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back;
+	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back, close, delete, refresh;
 	BorderPane firstBorderPane, secondBorderPane, thirdBorderPane;
 	Scene mainScene, viewSwimmerScene, addSwimmerScene;
 	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber;
@@ -51,6 +58,9 @@ public class Main extends Application {
 
 	TableView<Swimmer> swimmersTable;
 
+	/* (non-Javadoc)
+	 * @see javafx.application.Application#start(javafx.stage.Stage)
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) {
@@ -72,7 +82,7 @@ public class Main extends Application {
 			Group viewSwimmersGroup = new Group();
 			Group addSwimmerGroup = new Group();
 
-			mainScene = new Scene(firstBorderPane, 225, 220, Color.rgb(0, 0, 0, 0));
+			mainScene = new Scene(firstBorderPane, 225, 225, Color.rgb(0, 0, 0, 0));
 			viewSwimmerScene = new Scene(secondBorderPane, 1200, 600);
 			addSwimmerScene = new Scene(thirdBorderPane, 500, 500);
 
@@ -84,7 +94,10 @@ public class Main extends Application {
 
 			VBox vBoxTextFields = new VBox(5);
 			vBoxTextFields.setPadding(new Insets(10, 10, 10, 10));
-
+			
+			
+			// Defining TextFields
+			
 			idSwimmer = new TextField();
 			idSwimmer.setPrefSize(200, 20);
 			idSwimmer.setFont(Font.font("SanSerif", 15));
@@ -124,8 +137,32 @@ public class Main extends Application {
 			DOB.setPromptText("Date of birth");
 			DOB.setPrefSize(490, 20);
 			DOB.setStyle("-fx-font-size:15");
+			
+//			DOB.setConverter(new StringConverter<LocalDate>()
+//			{
+//			    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//
+//			    @Override
+//			    public String toString(LocalDate localDate)
+//			    {
+//			        if(localDate==null)
+//			            return "";
+//			        return dateTimeFormatter.format(localDate);
+//			    }
+//
+//			    @Override
+//			    public LocalDate fromString(String dateString)
+//			    {
+//			        if(dateString==null || dateString.trim().isEmpty())
+//			        {
+//			            return null;
+//			        }
+//			        return LocalDate.parse(dateString,dateTimeFormatter);
+//			    }
+//			});
+			
 
-			DOJ = new DatePicker();
+			DOJ = new DatePicker(LocalDate.now());
 			DOJ.setPromptText("Date of joining");
 			DOJ.setPrefSize(490, 20);
 			DOJ.setStyle("-fx-font-size:15");
@@ -146,7 +183,9 @@ public class Main extends Application {
 					} else {
 						String query = "INSERT INTO swimmers (idSwimmer, firstName, lastName, DOB, registrationId, dateJoined, parentName, contactNumber, coach) VALUES(?,?,?,?,?,?,?,?,?)";
 						pst = conn.prepareStatement(query);
-						pst.setString(1, idSwimmer.getText());
+						Integer value1A = Integer.parseInt(idSwimmer.getText());
+						pst.setInt(1,  value1A);
+//						pst.setString(1, idSwimmer.getText());
 						pst.setString(2, firstName.getText());
 						pst.setString(3, lastName.getText());
 						pst.setString(4, ((TextField) DOB.getEditor()).getText());
@@ -195,7 +234,9 @@ public class Main extends Application {
 			} else {
 				label.setText("Connection Successfull");
 			}
-			label.setFont(new Font("SanSerif", 20));
+			label.setFont(new Font("SanSerif", 15));
+			
+			// Defining buttons
 
 			newCoach = new Button("Add new coach");
 			newCoach.setPrefSize(200, 20);
@@ -228,8 +269,15 @@ public class Main extends Application {
 				thestage.setScene(viewSwimmerScene);
 				thestage.show();
 			});
+			
+			close = new Button("Exit");
+			close.setPrefSize(200, 20);
+			close.setFont(Font.font("SanSerif", 15));
+			close.setOnAction(e -> {
+				thestage.close();
+			});
 
-			vBoxForButtons.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer);
+			vBoxForButtons.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer, close);
 			root.getChildren().addAll(vBoxForButtons);
 
 			firstBorderPane.setCenter(vBoxForButtons);
@@ -401,7 +449,59 @@ public class Main extends Application {
 			back.setPadding(new Insets(5, 5, 5, 5));
 			secondBorderPane.setTop(back);
 			BorderPane.setMargin(back, new Insets(10, 0, 0, 10));
+			
+			// DELETE SELECTED BUTTON
+			delete = new Button("Delete");
+			delete.setPadding(new Insets(5,5,5,5));
+			delete.setPrefSize(100, 20);
+			delete.setOnAction(e -> {
+			    Swimmer selectedItem = swimmersTable.getSelectionModel().getSelectedItem();
+			    swimmersTable.getItems().remove(selectedItem);
+			    try {
+//			    	String query = "INSERT INTO swimmers (idSwimmer, firstName, lastName, DOB, registrationId, dateJoined, parentName, contactNumber, coach) VALUES(?,?,?,?,?,?,?,?,?)";
+//					pst = conn.prepareStatement(query);
+//					
+//					pst.execute();
+//					pst.close();
+			    } catch (Exception e3) {
+					// TODO: handle exception
+			    	e3.printStackTrace();
+				}
+			});
+			secondBorderPane.setRight(delete);
+			
+			// REFRESH BUTTON
+			refresh = new Button("Refresh");
+			refresh.setPadding(new Insets(5,5,5,5));
+			refresh.setPrefSize(100, 20);
+			refresh.setOnAction(e -> {
+				try {
+				data.clear(); // clears the table
+				String query = "select * from swimmers";
 
+				pst = conn.prepareStatement(query);
+				rs = pst.executeQuery();
+
+				while (rs.next()) {
+					data.add(new Swimmer(rs.getString("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
+							rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
+							rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
+					swimmersTable.setItems(data);
+				}
+				pst.close();
+				rs.close();
+			} catch (Exception e2) {
+				System.err.println(e2);
+
+			}
+			});
+			
+			VBox tableButtons = new VBox();
+			tableButtons.getChildren().addAll(delete,refresh);
+			BorderPane.setMargin(tableButtons, new Insets(10,5,0,0));
+			secondBorderPane.setRight(tableButtons);
+			
+			
 			vBoxForTable.getChildren().add(swimmersTable);
 			viewSwimmersGroup.getChildren().addAll(vBoxForTable);
 
