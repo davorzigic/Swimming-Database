@@ -19,6 +19,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.scene.Group;
@@ -37,6 +38,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -55,12 +57,10 @@ public class Main extends Application {
 	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber;
 	ComboBox<String> coach;
 	DatePicker DOB, DOJ;
+	ImageView logoPlace;
 
 	TableView<Swimmer> swimmersTable;
 
-	/* (non-Javadoc)
-	 * @see javafx.application.Application#start(javafx.stage.Stage)
-	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) {
@@ -82,7 +82,14 @@ public class Main extends Application {
 			Group viewSwimmersGroup = new Group();
 			Group addSwimmerGroup = new Group();
 
-			mainScene = new Scene(firstBorderPane, 225, 225, Color.rgb(0, 0, 0, 0));
+			mainScene = new Scene(firstBorderPane, 225, 300, Color.rgb(0, 0, 0, 0));
+			
+			// Disables only maximize button
+			primaryStage.setResizable(false);
+			
+			// Disables minimaze and maximaze buttons
+			//primaryStage.initStyle(StageStyle.UTILITY);
+
 			viewSwimmerScene = new Scene(secondBorderPane, 1200, 600);
 			addSwimmerScene = new Scene(thirdBorderPane, 500, 500);
 
@@ -276,8 +283,17 @@ public class Main extends Application {
 			close.setOnAction(e -> {
 				thestage.close();
 			});
+			
+			Image logo = new Image("file:logoViktorija.png");
+			ImageView logoPlace = new ImageView();
+			logoPlace.setImage(logo);
+			logoPlace.setFitWidth(200);
+			logoPlace.setPreserveRatio(true);
+			logoPlace.setSmooth(true);
+			logoPlace.setCache(true);
+			
 
-			vBoxForButtons.getChildren().addAll(label, newCoach, newSwimmer, viewCoaches, viewSwimmer, close);
+			vBoxForButtons.getChildren().addAll(logoPlace, label, newCoach, newSwimmer, viewCoaches, viewSwimmer, close);
 			root.getChildren().addAll(vBoxForButtons);
 
 			firstBorderPane.setCenter(vBoxForButtons);
@@ -441,7 +457,7 @@ public class Main extends Application {
 			swimmersTable.setTableMenuButtonVisible(true);
 
 			// BACK BUTTON
-			back = new Button("Back");
+			back = new Button("Back to Menu");
 			back.setOnAction(e -> {
 				thestage.setScene(mainScene);
 				thestage.show();
@@ -454,6 +470,7 @@ public class Main extends Application {
 			delete = new Button("Delete");
 			delete.setPadding(new Insets(5,5,5,5));
 			delete.setPrefSize(100, 20);
+			
 			delete.setOnAction(e -> {
 			    Swimmer selectedItem = swimmersTable.getSelectionModel().getSelectedItem();
 			    swimmersTable.getItems().remove(selectedItem);
@@ -468,7 +485,7 @@ public class Main extends Application {
 			    	e3.printStackTrace();
 				}
 			});
-			secondBorderPane.setRight(delete);
+			
 			
 			// REFRESH BUTTON
 			refresh = new Button("Refresh");
@@ -496,9 +513,9 @@ public class Main extends Application {
 			}
 			});
 			
-			VBox tableButtons = new VBox();
+			VBox tableButtons = new VBox(5);
 			tableButtons.getChildren().addAll(delete,refresh);
-			BorderPane.setMargin(tableButtons, new Insets(10,5,0,0));
+			BorderPane.setMargin(tableButtons, new Insets(35,5,0,0));
 			secondBorderPane.setRight(tableButtons);
 			
 			
