@@ -71,7 +71,14 @@ public class Swimmer {
 	public SimpleStringProperty getCoach() {
 		return coach;
 	}
-
+	
+	public String getFirstNameString() { 
+		return firstName.get(); 
+	}
+	
+	public String getIdString() {
+		return id.get();
+	}
 
 
 }
