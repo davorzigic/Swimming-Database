@@ -203,7 +203,7 @@ public class Main extends Application {
 						pst.setString(6, ((TextField) DOJ.getEditor()).getText());
 						pst.setString(7, parentName.getText());
 						pst.setString(8, contactNumber.getText());
-						pst.setString(9, coach.getSelectionModel().toString());
+						pst.setString(9, coach.getValue());
 						pst.execute();
 						pst.close();
 
