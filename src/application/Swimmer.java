@@ -1,10 +1,12 @@
 package application;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Swimmer {
 	
-	private final SimpleStringProperty id;
+//	private final SimpleStringProperty id;
+	private final SimpleIntegerProperty id;
 	private final SimpleStringProperty firstName;
 	private final SimpleStringProperty lastName;
 	private final SimpleStringProperty DOB;
@@ -15,8 +17,8 @@ public class Swimmer {
 	private final SimpleStringProperty coach;
 	
 	
-	public Swimmer(String id,String fName, String lName, String DOB, String registrationNumber, String dateJoined, String parentName, String contactNumber, String coach) {
-		this.id = new SimpleStringProperty(id);
+	public Swimmer(int id,String fName, String lName, String DOB, String registrationNumber, String dateJoined, String parentName, String contactNumber, String coach) {
+		this.id = new SimpleIntegerProperty(id);
 		this.firstName = new SimpleStringProperty(fName);
 		this.lastName = new SimpleStringProperty(lName);
 		this.DOB = new SimpleStringProperty(DOB);
@@ -28,7 +30,10 @@ public class Swimmer {
 	}
 
 
-	public SimpleStringProperty getId() {
+//	public SimpleStringProperty getId() {
+//		return id;
+//	}
+	public SimpleIntegerProperty getId() {
 		return id;
 	}
 
@@ -76,7 +81,7 @@ public class Swimmer {
 		return firstName.get(); 
 	}
 	
-	public String getIdString() {
+	public int getIdInteger() {
 		return id.get();
 	}
 

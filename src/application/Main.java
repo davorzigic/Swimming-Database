@@ -12,6 +12,7 @@ import javax.swing.GroupLayout.Alignment;
 import com.sun.prism.shader.DrawCircle_LinearGradient_REFLECT_AlphaTest_Loader;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +38,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ListView.EditEvent;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -53,7 +55,7 @@ public class Main extends Application {
 	PreparedStatement pst = null;
 	ResultSet rs = null;
 	Stage thestage;
-	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, back, close, delete, refresh;
+	Button newCoach, newSwimmer, viewCoaches, viewSwimmer, backBtn, closeBtn, deleteBtn, refreshBtn, editBtn;
 	BorderPane firstBorderPane, secondBorderPane, thirdBorderPane, fourthBorderPane;
 	Scene mainScene, viewSwimmerScene, addSwimmerScene;
 	TextField idSwimmer, firstName, lastName, registrationId, parentName, contactNumber;
@@ -148,30 +150,6 @@ public class Main extends Application {
 			DOB.setPrefSize(490, 20);
 			DOB.setStyle("-fx-font-size:15");
 
-			// DOB.setConverter(new StringConverter<LocalDate>()
-			// {
-			// private DateTimeFormatter dateTimeFormatter =
-			// DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			//
-			// @Override
-			// public String toString(LocalDate localDate)
-			// {
-			// if(localDate==null)
-			// return "";
-			// return dateTimeFormatter.format(localDate);
-			// }
-			//
-			// @Override
-			// public LocalDate fromString(String dateString)
-			// {
-			// if(dateString==null || dateString.trim().isEmpty())
-			// {
-			// return null;
-			// }
-			// return LocalDate.parse(dateString,dateTimeFormatter);
-			// }
-			// });
-
 			DOJ = new DatePicker(LocalDate.now());
 			DOJ.setPromptText("Date of joining");
 			DOJ.setPrefSize(490, 20);
@@ -182,6 +160,7 @@ public class Main extends Application {
 			saveButton.setFont(Font.font("SanSerif", 15));
 			saveButton.setOnAction(e -> {
 				try {
+					
 					if (idSwimmer.getText().isEmpty()) {
 						System.out.println("You dont have ID");
 						Alert alert = new Alert(AlertType.WARNING);
@@ -189,37 +168,71 @@ public class Main extends Application {
 						alert.setHeaderText(null);
 						alert.setContentText("Your ID field is empty.");
 						alert.showAndWait();
-
-					} else {
-						String query = "INSERT INTO swimmers (idSwimmer, firstName, lastName, DOB, registrationId, dateJoined, parentName, contactNumber, coach) VALUES(?,?,?,?,?,?,?,?,?)";
-						pst = conn.prepareStatement(query);
-						Integer value1A = Integer.parseInt(idSwimmer.getText());
-						pst.setInt(1, value1A);
-						// pst.setString(1, idSwimmer.getText());
-						pst.setString(2, firstName.getText());
-						pst.setString(3, lastName.getText());
-						pst.setString(4, ((TextField) DOB.getEditor()).getText());
-						pst.setString(5, registrationId.getText());
-						pst.setString(6, ((TextField) DOJ.getEditor()).getText());
-						pst.setString(7, parentName.getText());
-						pst.setString(8, contactNumber.getText());
-						pst.setString(9, coach.getValue());
-						pst.execute();
-						pst.close();
-
-						clearFields();
-
-						Alert alert = new Alert(AlertType.INFORMATION);
+					} else if(firstName.getText().isEmpty()) {
+						Alert alert = new Alert(AlertType.WARNING);
 						alert.setTitle("Information dialog");
 						alert.setHeaderText(null);
-						alert.setContentText("User has been created!");
+						alert.setContentText("Your First Name field is empty.");
 						alert.showAndWait();
+					} else if(lastName.getText().isEmpty()) {
+						Alert alert = new Alert(AlertType.WARNING);
+						alert.setTitle("Information dialog");
+						alert.setHeaderText(null);
+						alert.setContentText("Your Last Name field is empty.");
+						alert.showAndWait();
+					} else if(parentName.getText().isEmpty()) {
+						Alert alert = new Alert(AlertType.WARNING);
+						alert.setTitle("Information dialog");
+						alert.setHeaderText(null);
+						alert.setContentText("Your Parent Name field is empty.");
+						alert.showAndWait();
+					} else if(coach.getSelectionModel().isEmpty()) {
+						Alert alert = new Alert(AlertType.WARNING);
+						alert.setTitle("Information dialog");
+						alert.setHeaderText(null);
+						alert.setContentText("You have to pick coach.");
+						alert.showAndWait();
+					} else {
+						Alert saveConfirmation = new Alert(AlertType.CONFIRMATION);
+						saveConfirmation.setTitle("Confirmation Dialog");
+						// alert.setHeaderText("Look, a Confirmation Dialog");
+						saveConfirmation.setContentText("Save swimmer?");
+		
+						Optional<ButtonType> result = saveConfirmation.showAndWait();
+						if (result.get() == ButtonType.OK) {
+						// ... user chose OK
+							String query = "INSERT INTO swimmers (idSwimmer, firstName, lastName, DOB, registrationId, dateJoined, parentName, contactNumber, coach) VALUES(?,?,?,?,?,?,?,?,?)";
+							pst = conn.prepareStatement(query);
+							Integer value1A = Integer.parseInt(idSwimmer.getText());
+							pst.setInt(1, value1A);
+							// pst.setString(1, idSwimmer.getText());
+							pst.setString(2, (firstName.getText().substring(0,1).toUpperCase() + firstName.getText().substring(1)));
+							pst.setString(3, (lastName.getText().substring(0,1).toUpperCase() + lastName.getText().substring(1)));
+							pst.setString(4, ((TextField) DOB.getEditor()).getText());
+							pst.setString(5, registrationId.getText());
+							pst.setString(6, ((TextField) DOJ.getEditor()).getText());
+							pst.setString(7, (parentName.getText().substring(0,1).toUpperCase() + parentName.getText().substring(1)));
+							pst.setString(8, contactNumber.getText());
+							pst.setString(9, coach.getValue());
+							pst.execute();
+							pst.close();
+	
+							clearFields();
+	
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Information dialog");
+							alert.setHeaderText(null);
+							alert.setContentText("User has been created!");
+							alert.showAndWait();
+						} else {
+							saveConfirmation.close();
+						}
 						
-						System.out.println(coach.getSelectionModel().toString());
 					}
 
 				} catch (Exception e1) {
 					System.err.println(e1);
+					e1.printStackTrace();
 				}
 			});
 
@@ -249,7 +262,6 @@ public class Main extends Application {
 			label.setFont(new Font("SanSerif", 15));
 
 			// Defining buttons
-
 			newCoach = new Button("Add new coach");
 			newCoach.setPrefSize(200, 20);
 			newCoach.setFont(Font.font("SanSerif", 15));
@@ -289,7 +301,7 @@ public class Main extends Application {
 					rs = pst.executeQuery();
 
 					while (rs.next()) {
-						data.add(new Swimmer(rs.getString("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
+						data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
 								rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
 								rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
 						swimmersTable.setItems(data);
@@ -301,30 +313,19 @@ public class Main extends Application {
 
 				}
 				thestage.setScene(viewSwimmerScene);
-//				String query = "select * from swimmers";
-//
-//				pst = conn.prepareStatement(query);
-//				rs = pst.executeQuery();
-//
-//				while (rs.next()) {
-//					data.add(new Swimmer(rs.getString("idSwimmer"), rs.getString("firstName"),
-//							rs.getString("lastName"), rs.getString("DOB"), rs.getString("registrationId"),
-//							rs.getString("dateJoined"), rs.getString("parentName"), rs.getString("contactNumber"),
-//							rs.getString("coach")));
-//					swimmersTable.setItems(data);
-//				}
-//				pst.close();
-//				rs.close();
 				thestage.show();
 			});
-
-			close = new Button("Exit");
-			close.setPrefSize(200, 20);
-			close.setFont(Font.font("SanSerif", 15));
-			close.setOnAction(e -> {
+			
+			
+			// Close the application button
+			closeBtn = new Button("Exit");
+			closeBtn.setPrefSize(200, 20);
+			closeBtn.setFont(Font.font("SanSerif", 15));
+			closeBtn.setOnAction(e -> {
 				thestage.close();
 			});
-
+			
+			// Inserting logo into the imageView
 			Image logo = new Image("file:logoViktorija.png");
 			ImageView logoPlace = new ImageView();
 			logoPlace.setImage(logo);
@@ -334,7 +335,7 @@ public class Main extends Application {
 			logoPlace.setCache(true);
 
 			vBoxForButtons.getChildren().addAll(logoPlace, label, newCoach, newSwimmer, viewCoaches, viewSwimmer,
-					close);
+					closeBtn);
 			root.getChildren().addAll(vBoxForButtons);
 
 			firstBorderPane.setCenter(vBoxForButtons);
@@ -346,11 +347,11 @@ public class Main extends Application {
 
 			// Getting the ID from the database and inserting it into the first
 			// column
-			TableColumn<Swimmer, String> column1 = new TableColumn<Swimmer, String>("ID");
+			TableColumn<Swimmer, Number> column1 = new TableColumn<Swimmer, Number>("ID");
 			column1.setMinWidth(10);
-			column1.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("idSwimmer"));
-			column1.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+			column1.setCellValueFactory(new PropertyValueFactory<Swimmer, Number>("idSwimmer"));
+			column1.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, Number>, ObservableValue<Number>>() {
+				public ObservableValue<Number> call(CellDataFeatures<Swimmer, Number> u) {
 					// u.getValue() returns the Person instance for a particular
 					// TableView row
 
@@ -477,7 +478,7 @@ public class Main extends Application {
 				rs = pst.executeQuery();
 
 				while (rs.next()) {
-					data.add(new Swimmer(rs.getString("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
+					data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
 							rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
 							rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
 					swimmersTable.setItems(data);
@@ -498,21 +499,21 @@ public class Main extends Application {
 			swimmersTable.setTableMenuButtonVisible(true);
 
 			// BACK BUTTON
-			back = new Button("Back to Menu");
-			back.setOnAction(e -> {
+			backBtn = new Button("Back to Menu");
+			backBtn.setOnAction(e -> {
 				thestage.setScene(mainScene);
 				thestage.show();
 			});
-			back.setPadding(new Insets(5, 5, 5, 5));
-			secondBorderPane.setTop(back);
-			BorderPane.setMargin(back, new Insets(10, 0, 0, 10));
+			backBtn.setPadding(new Insets(5, 5, 5, 5));
+			secondBorderPane.setTop(backBtn);
+			BorderPane.setMargin(backBtn, new Insets(10, 0, 0, 10));
 
 			// DELETE SELECTED BUTTON
-			delete = new Button("Delete");
-			delete.setPadding(new Insets(5, 5, 5, 5));
-			delete.setPrefSize(100, 20);
+			deleteBtn = new Button("Delete");
+			deleteBtn.setPadding(new Insets(5, 5, 5, 5));
+			deleteBtn.setPrefSize(100, 20);
 
-			delete.setOnAction(e -> {
+			deleteBtn.setOnAction(e -> {
 				Swimmer selectedItem = swimmersTable.getSelectionModel().getSelectedItem();
 				
 				if (selectedItem == null) {
@@ -536,7 +537,7 @@ public class Main extends Application {
 						try {
 							String query = "DELETE FROM swimmers WHERE idSwimmer = ?";
 							pst = conn.prepareStatement(query);
-							pst.setInt(1, Integer.parseInt(selectedItem.getIdString()));
+							pst.setInt(1, selectedItem.getIdInteger());
 							pst.execute();
 							pst.close();
 						} catch (Exception e3) {
@@ -548,18 +549,19 @@ public class Main extends Application {
 						// ... user chose CANCEL or closed the dialog
 						deleteConfirmation.close();
 					}
-
 				
+				// Don't select anything after deleting
+				swimmersTable.getSelectionModel().clearSelection();
 				System.out.println();
 				}
 			});
 			
 
 			// REFRESH BUTTON
-			refresh = new Button("Refresh");
-			refresh.setPadding(new Insets(5, 5, 5, 5));
-			refresh.setPrefSize(100, 20);
-			refresh.setOnAction(e -> {
+			refreshBtn = new Button("Refresh");
+			refreshBtn.setPadding(new Insets(5, 5, 5, 5));
+			refreshBtn.setPrefSize(100, 20);
+			refreshBtn.setOnAction(e -> {
 				try {
 					data.clear(); // clears the table
 					String query = "select * from swimmers";
@@ -568,7 +570,7 @@ public class Main extends Application {
 					rs = pst.executeQuery();
 
 					while (rs.next()) {
-						data.add(new Swimmer(rs.getString("idSwimmer"), rs.getString("firstName"),
+						data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"),
 								rs.getString("lastName"), rs.getString("DOB"), rs.getString("registrationId"),
 								rs.getString("dateJoined"), rs.getString("parentName"), rs.getString("contactNumber"),
 								rs.getString("coach")));
@@ -581,9 +583,17 @@ public class Main extends Application {
 
 				}
 			});
+			
+			// EDIT BUTTON
+			editBtn = new Button("Edit");
+			editBtn.setPadding(new Insets(5,5,5,5));
+			editBtn.setPrefSize(100, 20);
+			editBtn.setOnAction(e -> {
+				
+			});
 
 			VBox tableButtons = new VBox(5);
-			tableButtons.getChildren().addAll(delete, refresh);
+			tableButtons.getChildren().addAll(deleteBtn, refreshBtn, editBtn);
 			BorderPane.setMargin(tableButtons, new Insets(35, 5, 0, 0));
 			secondBorderPane.setRight(tableButtons);
 
@@ -627,6 +637,16 @@ public class Main extends Application {
 		parentName.clear();
 		contactNumber.clear();
 		coach.setValue(null);
+	}
+	
+	public void checkEmpty(TextField name) {
+		if(name.getText().isEmpty()) {
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Information dialog");
+			alert.setHeaderText(null);
+			alert.setContentText("First name, last name, parent name and coach are mandatory fields.");
+			alert.showAndWait();
+		}
 	}
 
 	public static void main(String[] args) {
