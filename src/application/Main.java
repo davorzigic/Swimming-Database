@@ -64,7 +64,8 @@ public class Main extends Application {
 	ComboBox<String> coach;
 	DatePicker DOB, DOJ;
 	ImageView logoPlace;
-	final ObservableList<Swimmer> data = FXCollections.observableArrayList();
+	ViewSwimmersScene viewSwimmersScene;
+//	final ObservableList<Swimmer> data = FXCollections.observableArrayList();
 	
 
 	TableView<Swimmer> swimmersTable;
@@ -88,7 +89,7 @@ public class Main extends Application {
 			fourthBorderPane = new BorderPane();
 
 			Group root = new Group();
-			Group viewSwimmersGroup = new Group();
+//			Group viewSwimmersGroup = new Group();
 			Group addSwimmerGroup = new Group();
 
 			mainScene = new Scene(firstBorderPane, 225, 300, Color.rgb(0, 0, 0, 0));
@@ -99,7 +100,7 @@ public class Main extends Application {
 			// Disables minimaze and maximaze buttons
 			// primaryStage.initStyle(StageStyle.UTILITY);
 
-			viewSwimmerScene = new Scene(secondBorderPane, 1200, 600);
+//			viewSwimmerScene = new Scene(secondBorderPane, 1200, 600);
 			addSwimmerScene = new Scene(thirdBorderPane, 500, 500);
 
 			VBox vBoxForButtons = new VBox(5);
@@ -277,18 +278,7 @@ public class Main extends Application {
 			newCoach.setPrefSize(200, 20);
 			newCoach.setFont(Font.font("SanSerif", 15));
 			newCoach.setOnAction(e -> {	
-				ViewCoach viewCoach = new ViewCoach(fourthBorderPane,600,400);
-//				Scene viewCoach = new Scene(fourthBorderPane,600,400);
-//				VBox testVbox = new VBox(5);
-//				TextField testField = new TextField();
-//				testField.setPrefSize(200, 20);
-//				testField.setFont(Font.font("SanSerif", 15));
-//				testField.setPromptText("Testing");
-				
-//				testVbox.getChildren().add(testField);
-//				fourthBorderPane.setCenter(testVbox);
-				
-						
+				AddNewCoach viewCoach = new AddNewCoach(fourthBorderPane,600,400);						
 				thestage.setScene(viewCoach);
 				thestage.show();
 			});
@@ -314,29 +304,31 @@ public class Main extends Application {
 			viewSwimmer.setPrefSize(200, 20);
 			viewSwimmer.setFont(Font.font("SanSerif", 15));
 			viewSwimmer.setOnAction(e -> {
-				thestage.setScene(viewSwimmerScene);
+				viewSwimmersScene = new ViewSwimmersScene(secondBorderPane , 1200, 600);				
+				thestage.setScene(viewSwimmersScene);
 				thestage.show();
-				try {
-					data.clear(); // clears the table
-					String query = "select * from swimmers";
-
-					pst = conn.prepareStatement(query);
-					rs = pst.executeQuery();
-
-					while (rs.next()) {
-						data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
-								rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
-								rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
-						swimmersTable.setItems(data);
-					}
-					pst.close();
-					rs.close();
-				} catch (Exception e2) {
-					System.err.println(e2);
-
-				}
-				thestage.setScene(viewSwimmerScene);
-				thestage.show();
+//				try {
+//					viewSwimmersScene.getData().clear(); // clears the table
+//					String query = "select * from swimmers";
+//
+//					viewSwimmersScene.setPst() pst = viewSwimmersScene.getConn(); conn.prepareStatement(query);
+//					rs = pst.executeQuery();
+//
+//					while (rs.next()) {
+//						viewSwimmersScene.getData().add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
+//								rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
+//								rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
+//						swimmersTable.setItems(viewSwimmersScene.getData());
+//					}
+//					pst.close();
+//					rs.close();
+//					viewSwimmersScene.fillingTable();
+//				} catch (Exception e2) {
+//					System.err.println(e2);
+//
+//				}
+//				thestage.setScene(viewSwimmerScene);
+//				thestage.show();
 			});
 			
 			
@@ -365,266 +357,278 @@ public class Main extends Application {
 			BorderPane.setMargin(root, new Insets(20, 20, 20, 20));
 
 			// Table for viewing data inside database
-			swimmersTable = new TableView<>();
-			final ObservableList<Swimmer> data = FXCollections.observableArrayList();
-
-			// Getting the ID from the database and inserting it into the first
-			// column
-			TableColumn<Swimmer, Number> column1 = new TableColumn<Swimmer, Number>("ID");
-			column1.setMinWidth(10);
-			column1.setCellValueFactory(new PropertyValueFactory<Swimmer, Number>("idSwimmer"));
-			column1.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, Number>, ObservableValue<Number>>() {
-				public ObservableValue<Number> call(CellDataFeatures<Swimmer, Number> u) {
-					// u.getValue() returns the Person instance for a particular
-					// TableView row
-
-					return u.getValue().getId();
-				}
-			});
-
-			// Getting the first name from the database and inserting it into
-			// the second column
-			TableColumn<Swimmer, String> column2 = new TableColumn<Swimmer, String>("First name");
-			column2.setMinWidth(100);
-			column2.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("firstName"));
-			column2.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the Person instance for a particular
-					// TableView row
-
-					return u.getValue().getFirstName();
-				}
-			});
-
-			// Getting the last name from the database and inserting it into the
-			// third column
-			TableColumn<Swimmer, String> column3 = new TableColumn<Swimmer, String>("Last Name");
-			column3.setMinWidth(100);
-			column3.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("lastName"));
-			column3.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the Person instance for a particular
-					// TableView row
-
-					return u.getValue().getLastName();
-				}
-			});
-
-			// Getting the DOB from the database and inserting it into the
-			// fourth column
-			TableColumn<Swimmer, String> column4 = new TableColumn<Swimmer, String>("DOB");
-			column4.setMinWidth(100);
-			column4.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("DOB"));
-			column4.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the User instance for a particular
-					// TableView row
-
-					return u.getValue().getDOB();
-				}
-			});
-
-			// Getting the DOB from the database and inserting it into the
-
-			TableColumn<Swimmer, String> column5 = new TableColumn<Swimmer, String>("Registration number");
-			column5.setMinWidth(100);
-			column5.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("registrationNumber"));
-			column5.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the User instance for a particular
-					// TableView row
-
-					return u.getValue().getRegistrationNumber();
-				}
-			});
-
-			// Getting the DOB from the database and inserting it into the
-
-			TableColumn<Swimmer, String> column6 = new TableColumn<Swimmer, String>("DOJ");
-			column6.setMinWidth(100);
-			column6.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("DOJ"));
-			column6.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the User instance for a particular
-					// TableView row
-
-					return u.getValue().getDateJoined();
-				}
-			});
-
-			// Getting the DOB from the database and inserting it into the
-
-			TableColumn<Swimmer, String> column7 = new TableColumn<Swimmer, String>("Parent Name");
-			column7.setMinWidth(100);
-			column7.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("parentName"));
-			column7.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the User instance for a particular
-					// TableView row
-
-					return u.getValue().getParentName();
-				}
-			});
-
-			// Getting the DOB from the database and inserting it into the
-
-			TableColumn<Swimmer, String> column8 = new TableColumn<Swimmer, String>("Contact Number");
-			column8.setMinWidth(100);
-			column8.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("contactNumber"));
-			column8.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the User instance for a particular
-					// TableView row
-
-					return u.getValue().getContactNumber();
-				}
-			});
-
-			TableColumn<Swimmer, String> column9 = new TableColumn<Swimmer, String>("Coach");
-			column9.setMinWidth(100);
-			column9.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("coach"));
-			column9.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
-				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
-					// u.getValue() returns the User instance for a particular
-					// TableView row
-
-					return u.getValue().getCoach();
-				}
-			});
-
+//			swimmersTable = new TableView<>();
+//			final ObservableList<Swimmer> data = FXCollections.observableArrayList();
+//
+//			// Getting the ID from the database and inserting it into the first
+//			// column
+//			TableColumn<Swimmer, Number> column1 = new TableColumn<Swimmer, Number>("ID");
+//			column1.setMinWidth(10);
+//			column1.setCellValueFactory(new PropertyValueFactory<Swimmer, Number>("idSwimmer"));
+//			column1.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, Number>, ObservableValue<Number>>() {
+//				public ObservableValue<Number> call(CellDataFeatures<Swimmer, Number> u) {
+//					// u.getValue() returns the Person instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getId();
+//				}
+//			});
+//
+//			// Getting the first name from the database and inserting it into
+//			// the second column
+//			TableColumn<Swimmer, String> column2 = new TableColumn<Swimmer, String>("First name");
+//			column2.setMinWidth(100);
+//			column2.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("firstName"));
+//			column2.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the Person instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getFirstName();
+//				}
+//			});
+//
+//			// Getting the last name from the database and inserting it into the
+//			// third column
+//			TableColumn<Swimmer, String> column3 = new TableColumn<Swimmer, String>("Last Name");
+//			column3.setMinWidth(100);
+//			column3.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("lastName"));
+//			column3.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the Person instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getLastName();
+//				}
+//			});
+//
+//			// Getting the DOB from the database and inserting it into the
+//			// fourth column
+//			TableColumn<Swimmer, String> column4 = new TableColumn<Swimmer, String>("DOB");
+//			column4.setMinWidth(100);
+//			column4.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("DOB"));
+//			column4.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the User instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getDOB();
+//				}
+//			});
+//
+//			// Getting the DOB from the database and inserting it into the
+//
+//			TableColumn<Swimmer, String> column5 = new TableColumn<Swimmer, String>("Registration number");
+//			column5.setMinWidth(100);
+//			column5.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("registrationNumber"));
+//			column5.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the User instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getRegistrationNumber();
+//				}
+//			});
+//
+//			// Getting the DOB from the database and inserting it into the
+//
+//			TableColumn<Swimmer, String> column6 = new TableColumn<Swimmer, String>("DOJ");
+//			column6.setMinWidth(100);
+//			column6.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("DOJ"));
+//			column6.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the User instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getDateJoined();
+//				}
+//			});
+//
+//			// Getting the DOB from the database and inserting it into the
+//
+//			TableColumn<Swimmer, String> column7 = new TableColumn<Swimmer, String>("Parent Name");
+//			column7.setMinWidth(100);
+//			column7.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("parentName"));
+//			column7.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the User instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getParentName();
+//				}
+//			});
+//
+//			// Getting the DOB from the database and inserting it into the
+//
+//			TableColumn<Swimmer, String> column8 = new TableColumn<Swimmer, String>("Contact Number");
+//			column8.setMinWidth(100);
+//			column8.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("contactNumber"));
+//			column8.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the User instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getContactNumber();
+//				}
+//			});
+//
+//			TableColumn<Swimmer, String> column9 = new TableColumn<Swimmer, String>("Coach");
+//			column9.setMinWidth(100);
+//			column9.setCellValueFactory(new PropertyValueFactory<Swimmer, String>("coach"));
+//			column9.setCellValueFactory(new Callback<CellDataFeatures<Swimmer, String>, ObservableValue<String>>() {
+//				public ObservableValue<String> call(CellDataFeatures<Swimmer, String> u) {
+//					// u.getValue() returns the User instance for a particular
+//					// TableView row
+//
+//					return u.getValue().getCoach();
+//				}
+//			});
+//
+			
+			
+			
+			
+	
+			
+			
 			// Filling the table with the data from the database
-			try {
-				data.clear(); // clears the table
-				String query = "select * from swimmers";
-
-				pst = conn.prepareStatement(query);
-				rs = pst.executeQuery();
-
-				while (rs.next()) {
-					data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
-							rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
-							rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
-					swimmersTable.setItems(data);
-				}
-				pst.close();
-				rs.close();
-			} catch (Exception e2) {
-				System.err.println(e2);
-
-			}
-
-			// Here was unchecked warning
-			swimmersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8,
-					column9);
-			swimmersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-			// Sorting button in the table
-			swimmersTable.setTableMenuButtonVisible(true);
-
-			// BACK BUTTON
-			backBtn = new Button("Back to Menu");
-			backBtn.setOnAction(e -> {
-				thestage.setScene(mainScene);
-				thestage.show();
-			});
-			backBtn.setPadding(new Insets(5, 5, 5, 5));
-			secondBorderPane.setTop(backBtn);
-			BorderPane.setMargin(backBtn, new Insets(10, 0, 0, 10));
-
-			// DELETE SELECTED BUTTON
-			deleteBtn = new Button("Delete");
-			deleteBtn.setPadding(new Insets(5, 5, 5, 5));
-			deleteBtn.setPrefSize(100, 20);
-
-			deleteBtn.setOnAction(e -> {
-				Swimmer selectedItem = swimmersTable.getSelectionModel().getSelectedItem();
-				
-				if (selectedItem == null) {
-						Alert noSelectionWarning = new Alert(AlertType.WARNING);
-						noSelectionWarning.setTitle("No Selection");
-						noSelectionWarning.setHeaderText("No Person Selected");
-						noSelectionWarning.setContentText("Please select a person in the table.");
-	
-						noSelectionWarning.showAndWait();
-				} else {
-				
-					Alert deleteConfirmation = new Alert(AlertType.CONFIRMATION);
-					deleteConfirmation.setTitle("Confirmation Dialog");
-					// alert.setHeaderText("Look, a Confirmation Dialog");
-					deleteConfirmation.setContentText("Do you really want to delete selected swimmer?");
-	
-					Optional<ButtonType> result = deleteConfirmation.showAndWait();
-					if (result.get() == ButtonType.OK) {
-						// ... user chose OK
-
-						try {
-							String query = "DELETE FROM swimmers WHERE idSwimmer = ?";
-							pst = conn.prepareStatement(query);
-							pst.setInt(1, selectedItem.getIdInteger());
-							pst.execute();
-							pst.close();
-						} catch (Exception e3) {
-							// TODO: handle exception
-							e3.printStackTrace();
-						}
-						swimmersTable.getItems().remove(selectedItem);
-					} else {
-						// ... user chose CANCEL or closed the dialog
-						deleteConfirmation.close();
-					}
-				
-				// Don't select anything after deleting
-				swimmersTable.getSelectionModel().clearSelection();
-				System.out.println();
-				}
-			});
+//			try {
+//				viewSwimmersScene.getData().clear(); // clears the table
+//				String query = "select * from swimmers";
+//
+//				pst = conn.prepareStatement(query);
+//				rs = pst.executeQuery();
+//
+//				while (rs.next()) {
+//					viewSwimmersScene.getData().add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"), rs.getString("lastName"),
+//							rs.getString("DOB"), rs.getString("registrationId"), rs.getString("dateJoined"),
+//							rs.getString("parentName"), rs.getString("contactNumber"), rs.getString("coach")));
+//					swimmersTable.setItems(viewSwimmersScene.getData());
+//				}
+//				pst.close();
+//				rs.close();
+//			} catch (Exception e2) {
+//				System.err.println(e2);
+//
+//			}
 			
-
-			// REFRESH BUTTON
-			refreshBtn = new Button("Refresh");
-			refreshBtn.setPadding(new Insets(5, 5, 5, 5));
-			refreshBtn.setPrefSize(100, 20);
-			refreshBtn.setOnAction(e -> {
-				try {
-					data.clear(); // clears the table
-					String query = "select * from swimmers";
-
-					pst = conn.prepareStatement(query);
-					rs = pst.executeQuery();
-
-					while (rs.next()) {
-						data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"),
-								rs.getString("lastName"), rs.getString("DOB"), rs.getString("registrationId"),
-								rs.getString("dateJoined"), rs.getString("parentName"), rs.getString("contactNumber"),
-								rs.getString("coach")));
-						swimmersTable.setItems(data);
-					}
-					pst.close();
-					rs.close();
-				} catch (Exception e2) {
-					System.err.println(e2);
-
-				}
-			});
 			
-			// EDIT BUTTON
-			editBtn = new Button("Edit");
-			editBtn.setPadding(new Insets(5,5,5,5));
-			editBtn.setPrefSize(100, 20);
-			editBtn.setOnAction(e -> {
-				
-			});
-
-			VBox tableButtons = new VBox(5);
-			tableButtons.getChildren().addAll(deleteBtn, refreshBtn, editBtn);
-			BorderPane.setMargin(tableButtons, new Insets(35, 5, 0, 0));
-			secondBorderPane.setRight(tableButtons);
-
-			vBoxForTable.getChildren().add(swimmersTable);
-			viewSwimmersGroup.getChildren().addAll(vBoxForTable);
-
-			secondBorderPane.setCenter(vBoxForTable);
-			BorderPane.setMargin(viewSwimmersGroup, new Insets(20, 20, 20, 20));
+			
+			
+			
+//
+//			// Here was unchecked warning
+//			swimmersTable.getColumns().addAll(column1, column2, column3, column4, column5, column6, column7, column8,
+//					column9);
+//			swimmersTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//
+//			// Sorting button in the table
+//			swimmersTable.setTableMenuButtonVisible(true);
+//
+//			// BACK BUTTON
+//			backBtn = new Button("Back to Menu");
+//			backBtn.setOnAction(e -> {
+//				thestage.setScene(mainScene);
+//				thestage.show();
+//			});
+//			backBtn.setPadding(new Insets(5, 5, 5, 5));
+//			secondBorderPane.setTop(backBtn);
+//			BorderPane.setMargin(backBtn, new Insets(10, 0, 0, 10));
+//
+//			// DELETE SELECTED BUTTON
+//			deleteBtn = new Button("Delete");
+//			deleteBtn.setPadding(new Insets(5, 5, 5, 5));
+//			deleteBtn.setPrefSize(100, 20);
+//
+//			deleteBtn.setOnAction(e -> {
+//				Swimmer selectedItem = swimmersTable.getSelectionModel().getSelectedItem();
+//				
+//				if (selectedItem == null) {
+//						Alert noSelectionWarning = new Alert(AlertType.WARNING);
+//						noSelectionWarning.setTitle("No Selection");
+//						noSelectionWarning.setHeaderText("No Person Selected");
+//						noSelectionWarning.setContentText("Please select a person in the table.");
+//	
+//						noSelectionWarning.showAndWait();
+//				} else {
+//				
+//					Alert deleteConfirmation = new Alert(AlertType.CONFIRMATION);
+//					deleteConfirmation.setTitle("Confirmation Dialog");
+//					// alert.setHeaderText("Look, a Confirmation Dialog");
+//					deleteConfirmation.setContentText("Do you really want to delete selected swimmer?");
+//	
+//					Optional<ButtonType> result = deleteConfirmation.showAndWait();
+//					if (result.get() == ButtonType.OK) {
+//						// ... user chose OK
+//
+//						try {
+//							String query = "DELETE FROM swimmers WHERE idSwimmer = ?";
+//							pst = conn.prepareStatement(query);
+//							pst.setInt(1, selectedItem.getIdInteger());
+//							pst.execute();
+//							pst.close();
+//						} catch (Exception e3) {
+//							// TODO: handle exception
+//							e3.printStackTrace();
+//						}
+//						swimmersTable.getItems().remove(selectedItem);
+//					} else {
+//						// ... user chose CANCEL or closed the dialog
+//						deleteConfirmation.close();
+//					}
+//				
+//				// Don't select anything after deleting
+//				swimmersTable.getSelectionModel().clearSelection();
+//				System.out.println();
+//				}
+//			});
+//			
+//
+//			// REFRESH BUTTON
+//			refreshBtn = new Button("Refresh");
+//			refreshBtn.setPadding(new Insets(5, 5, 5, 5));
+//			refreshBtn.setPrefSize(100, 20);
+//			refreshBtn.setOnAction(e -> {
+//				try {
+//					data.clear(); // clears the table
+//					String query = "select * from swimmers";
+//
+//					pst = conn.prepareStatement(query);
+//					rs = pst.executeQuery();
+//
+//					while (rs.next()) {
+//						data.add(new Swimmer(rs.getInt("idSwimmer"), rs.getString("firstName"),
+//								rs.getString("lastName"), rs.getString("DOB"), rs.getString("registrationId"),
+//								rs.getString("dateJoined"), rs.getString("parentName"), rs.getString("contactNumber"),
+//								rs.getString("coach")));
+//						swimmersTable.setItems(data);
+//					}
+//					pst.close();
+//					rs.close();
+//				} catch (Exception e2) {
+//					System.err.println(e2);
+//
+//				}
+//			});
+//			
+//			// EDIT BUTTON
+//			editBtn = new Button("Edit");
+//			editBtn.setPadding(new Insets(5,5,5,5));
+//			editBtn.setPrefSize(100, 20);
+//			editBtn.setOnAction(e -> {
+//				
+//			});
+//
+//			VBox tableButtons = new VBox(5);
+//			tableButtons.getChildren().addAll(deleteBtn, refreshBtn, editBtn);
+//			BorderPane.setMargin(tableButtons, new Insets(35, 5, 0, 0));
+//			secondBorderPane.setRight(tableButtons);
+//
+//			vBoxForTable.getChildren().add(swimmersTable);
+//			viewSwimmersGroup.getChildren().addAll(vBoxForTable);
+//
+//			secondBorderPane.setCenter(vBoxForTable);
+//			BorderPane.setMargin(viewSwimmersGroup, new Insets(20, 20, 20, 20));
 
 			mainScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(mainScene);

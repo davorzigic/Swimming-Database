@@ -22,7 +22,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class ViewCoach extends Scene {
+public class AddNewCoach extends Scene {
 
 	
 	Main test = new Main();
@@ -33,7 +33,7 @@ public class ViewCoach extends Scene {
 	
 
 	
-	public ViewCoach(BorderPane root, double width, double height) {
+	public AddNewCoach(BorderPane root, double width, double height) {
 		super(root, width, height);
 		// TODO Auto-generated constructor stub
 		vBoxForFields = new VBox(5);
