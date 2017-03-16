@@ -34,6 +34,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -48,6 +49,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 public class Main extends Application {
 
@@ -63,6 +65,7 @@ public class Main extends Application {
 	DatePicker DOB, DOJ;
 	ImageView logoPlace;
 	final ObservableList<Swimmer> data = FXCollections.observableArrayList();
+	
 
 	TableView<Swimmer> swimmersTable;
 
@@ -260,14 +263,34 @@ public class Main extends Application {
 				label.setText("Connection Successfull");
 			}
 			label.setFont(new Font("SanSerif", 15));
+			
+			TextField username = new TextField();
+			username.setFont(Font.font("SanSerif", 20));
+			username.setPromptText("Username");
 
+			PasswordField password = new PasswordField();
+			password.setFont(Font.font("SanSerif", 20));
+			password.setPromptText("Password");
+			
 			// Defining buttons
 			newCoach = new Button("Add new coach");
 			newCoach.setPrefSize(200, 20);
 			newCoach.setFont(Font.font("SanSerif", 15));
-			newCoach.setOnAction(e -> {
-				primaryStage.setScene(mainScene);
-				primaryStage.show();
+			newCoach.setOnAction(e -> {	
+				ViewCoach viewCoach = new ViewCoach(fourthBorderPane,600,400);
+//				Scene viewCoach = new Scene(fourthBorderPane,600,400);
+//				VBox testVbox = new VBox(5);
+//				TextField testField = new TextField();
+//				testField.setPrefSize(200, 20);
+//				testField.setFont(Font.font("SanSerif", 15));
+//				testField.setPromptText("Testing");
+				
+//				testVbox.getChildren().add(testField);
+//				fourthBorderPane.setCenter(testVbox);
+				
+						
+				thestage.setScene(viewCoach);
+				thestage.show();
 			});
 
 			newSwimmer = new Button("Add new swimmer");
@@ -652,4 +675,6 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+
+	
 }
