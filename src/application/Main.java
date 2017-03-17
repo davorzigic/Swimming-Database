@@ -66,7 +66,7 @@ public class Main extends Application {
 	ImageView logoPlace;
 	ViewSwimmersScene viewSwimmersScene;
 //	final ObservableList<Swimmer> data = FXCollections.observableArrayList();
-	
+	Stage primaryStage;
 
 	TableView<Swimmer> swimmersTable;
 
@@ -74,8 +74,8 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-
-			thestage = primaryStage;
+			this.primaryStage = primaryStage;
+			thestage = this.primaryStage;
 
 			// Check the connection with the database
 			CheckConnection();

@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Optional;
+import java.util.TreeSet;
 
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,7 +26,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
-public class ViewSwimmersScene extends Scene {
+public class ViewSwimmersScene extends Scene implements methodsTest {
 	
 	final ObservableList<Swimmer> data;
 	TableView<Swimmer> swimmersTable;
@@ -34,33 +36,45 @@ public class ViewSwimmersScene extends Scene {
 	ResultSet rs = null;
 	
 	Button backBtn, editBtn, refreshBtn, deleteBtn;
-	VBox vBoxForTable;
-	Group viewSwimmersGroup;
+	VBox vBoxForTable, vBoxForBackButton;
+	Group viewSwimmersGroup, backButtonGroup;
+	
+	BorderPane root;
+	
 	
 	public ViewSwimmersScene(BorderPane root, double width, double height) {
 		super(root, width, height);
 		// TODO Auto-generated constructor stub
+		this.root = root;
 		swimmersTable = new TableView<>();
 		data = FXCollections.observableArrayList();
-		vBoxForTable = new VBox(5);
-		viewSwimmersGroup = new Group();
-		vBoxForTable.getChildren().add(swimmersTable);
-		viewSwimmersGroup.getChildren().addAll(vBoxForTable);
-
-		root.setCenter(vBoxForTable);
-		BorderPane.setMargin(viewSwimmersGroup, new Insets(20, 20, 20, 20));
 		
 		CheckConnection();
-		settingTable();
-		
+		settingScene();
+
 		
 		
 	}
-
 	
+	private void settingScene() {
+		settingTable();
+		settingBackButton();
+		
+	}
+
+	private void settingBackButton() {
+		backBtn = new Button("Back to Menu");
+		backBtn.setPadding(new Insets(5, 5, 5, 5));
+		root.setTop(backBtn);
+		BorderPane.setAlignment(backBtn, Pos.TOP_RIGHT);
+		BorderPane.setMargin(backBtn, new Insets(10, 10, 10, 10));
+	}
 	
 	
 	@SuppressWarnings("unchecked")
+	/***
+	 * This method sets the table and puts it into Scene
+	 */
 	private void settingTable() {
 		// Getting the ID from the database and inserting it into the first
 		// column
@@ -194,10 +208,21 @@ public class ViewSwimmersScene extends Scene {
 		// Sorting button in the table
 		swimmersTable.setTableMenuButtonVisible(true);
 		
+		vBoxForTable = new VBox(5);
+		viewSwimmersGroup = new Group();
+		vBoxForTable.getChildren().add(swimmersTable);
+		viewSwimmersGroup.getChildren().addAll(vBoxForTable);
+		BorderPane.setMargin(viewSwimmersGroup, new Insets(20, 20, 20, 20));
+		
+		root.setCenter(vBoxForTable);
+		
 		fillingTable();
 		
 	}
 	
+	/***
+	 * This method fills the table with the data from database 
+	 */
 	private void fillingTable() {
 		try {
 			data.clear(); // clears the table
@@ -225,35 +250,8 @@ public class ViewSwimmersScene extends Scene {
 	}
 	
 	
-	public ObservableList<Swimmer> getData() {
-		return data;
-	}
 	
-	public PreparedStatement getPst() {
-		return pst;
-	}
-
-	public void setPst(PreparedStatement pst) {
-		this.pst = pst;
-	}
-
-	public Connection getConn() {
-		return conn;
-	}
-
-
-	public void setConn(Connection conn) {
-		this.conn = conn;
-	}
 	
-	public ResultSet getRs() {
-		return rs;
-	}
-
-
-	public void setRs(ResultSet rs) {
-		this.rs = rs;
-	}
 	
 	/***
 	 * This method checks do we have the connection with the database
@@ -264,7 +262,7 @@ public class ViewSwimmersScene extends Scene {
 			System.out.println("Connection Not Successful");
 			System.exit(1);
 		} else {
-			System.out.println("Connection Successful");
+//			System.out.println("Connection Successful");
 		}
 	}
 }
