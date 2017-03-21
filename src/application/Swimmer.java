@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Swimmer {
 	
-//	private final SimpleStringProperty id;
+
 	private final SimpleIntegerProperty id;
 	private final SimpleStringProperty firstName;
 	private final SimpleStringProperty lastName;
@@ -30,9 +30,7 @@ public class Swimmer {
 	}
 
 
-//	public SimpleStringProperty getId() {
-//		return id;
-//	}
+
 	public SimpleIntegerProperty getId() {
 		return id;
 	}
@@ -77,13 +75,41 @@ public class Swimmer {
 		return coach;
 	}
 	
+	public int getIdInteger() {
+		return id.get();
+	}
+	
 	public String getFirstNameString() { 
 		return firstName.get(); 
 	}
 	
-	public int getIdInteger() {
-		return id.get();
+	public String getLastNameString() {
+		return lastName.get();
 	}
-
+	
+	public String getDOBSstring() {
+		return DOB.get();
+	}
+	
+	public String getRegistrationNumberString() {
+		return registrationNumber.get();
+	}
+	
+	public String getDOJString() {
+		return dateJoined.get();
+	}
+	
+	public String getParentNameString() {
+		return parentName.get();
+	}
+	
+	public String getContactNumberString() {
+		return contactNumber.get();
+	}
+	
+	public String getCoachString() {
+		return coach.get();
+	}
+	
 
 }
